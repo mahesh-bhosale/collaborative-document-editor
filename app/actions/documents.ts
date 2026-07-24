@@ -86,8 +86,18 @@ export async function updateDocument(docId: string, updates: { title?: string; c
     where: eq(document.id, docId),
   })
 
-  if (!doc || doc.ownerId !== userId) {
-    throw new Error('Access denied')
+  if (!doc) throw new Error('Document not found')
+
+  // Allow owner OR users with EDITOR permission to update
+  if (doc.ownerId !== userId) {
+    const share = await db.query.documentShare.findFirst({
+      where: and(
+        eq(documentShare.documentId, docId),
+        eq(documentShare.sharedWithId, userId),
+        eq(documentShare.permission, 'EDITOR')
+      ),
+    })
+    if (!share) throw new Error('Access denied')
   }
 
   await db
