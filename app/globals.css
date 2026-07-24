@@ -269,8 +269,10 @@
   margin: 1.5rem 0;
 }
 
-.ProseMirror strong {
-  font-weight: 600;
+.ProseMirror strong,
+.ProseMirror b {
+  font-weight: 700 !important;
+  color: inherit;
 }
 
 .ProseMirror u {

@@ -6,11 +6,14 @@ A production-ready collaborative document editor with the following features:
 
 ### Core Features
 - User authentication (email + password)
-- Rich text document editing with Tiptap
+- Rich text document editing with Tiptap (Bold, Italic, Underline, H1/H2/H3, Lists, Code, Blockquote, HR)
+- Inline document renaming (click pencil icon)
 - Document creation, editing, and deletion
-- Document sharing with fine-grained permissions
-- Auto-save functionality
-- Permission-based access control
+- File Upload capability (.txt, .md file import into editable TipTap document)
+- Document sharing with fine-grained permissions (VIEWER vs EDITOR)
+- Auto-save functionality (debounced with 4-state indicator: saving/saved/error/idle)
+- Permission-based access control with custom Access Denied error page
+- Automated unit test suite (`npm test`)
 
 ### Technology Stack
 - Next.js 16 with App Router

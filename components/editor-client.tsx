@@ -11,6 +11,8 @@ import { ShareDialog } from './share-dialog'
 import { useRouter } from 'next/navigation'
 import { Check, Cloud, CloudOff, Share2, ArrowLeft, Pencil, Eye } from 'lucide-react'
 
+import { markdownToHTML } from '@/lib/markdown-parser'
+
 interface EditorClientProps {
   docId: string
   initialContent: object
@@ -45,6 +47,14 @@ export function EditorClient({
         placeholder: 'Start typing your document here...',
       }),
     ],
+    editorProps: {
+      transformPastedText(text) {
+        if (text && (text.includes('**') || text.includes('#') || text.includes('- '))) {
+          return markdownToHTML(text)
+        }
+        return text
+      },
+    },
     content: initialContent || '',
     editable: canEdit,
   })

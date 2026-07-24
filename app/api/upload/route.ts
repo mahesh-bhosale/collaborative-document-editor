@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { createDocument } from '@/app/actions/documents'
+import { parseMarkdownToTipTap } from '@/lib/markdown-parser'
 
 export async function POST(request: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -35,45 +36,8 @@ export async function POST(request: NextRequest) {
 
     const text = await file.text()
 
-    // Convert plain text to TipTap-compatible JSON
-    const lines = text.split('\n')
-    const content = {
-      type: 'doc',
-      content: lines
-        .map((line) => {
-          const trimmed = line.trim()
-          if (!trimmed) {
-            return { type: 'paragraph', content: [] }
-          }
-          // Detect markdown headings
-          if (trimmed.startsWith('### ')) {
-            return {
-              type: 'heading',
-              attrs: { level: 3 },
-              content: [{ type: 'text', text: trimmed.slice(4) }],
-            }
-          }
-          if (trimmed.startsWith('## ')) {
-            return {
-              type: 'heading',
-              attrs: { level: 2 },
-              content: [{ type: 'text', text: trimmed.slice(3) }],
-            }
-          }
-          if (trimmed.startsWith('# ')) {
-            return {
-              type: 'heading',
-              attrs: { level: 1 },
-              content: [{ type: 'text', text: trimmed.slice(2) }],
-            }
-          }
-          return {
-            type: 'paragraph',
-            content: [{ type: 'text', text: line }],
-          }
-        })
-        .filter(Boolean),
-    }
+    // Parse full markdown features (Headings, Bold, Italic, Lists, Code blocks, etc.)
+    const content = parseMarkdownToTipTap(text)
 
     // Use original file name (without extension) as document title
     const title = file.name.replace(/\.(txt|md|markdown)$/i, '') || 'Imported Document'
